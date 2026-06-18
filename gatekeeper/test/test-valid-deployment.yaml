@@ -1,0 +1,31 @@
+# Test deployment hợp lệ - PHẢI PASS
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-valid
+  namespace: demo
+  labels:
+    owner: team-platform  # ✅ Có label owner
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: test-valid
+  template:
+    metadata:
+      labels:
+        app: test-valid
+        owner: team-platform  # ✅ Có label owner
+    spec:
+      securityContext:
+        runAsUser: 1000  # ✅ Không chạy root
+      containers:
+      - name: app
+        image: nginx:1.21.6  # ✅ Có version tag cụ thể
+        resources:
+          limits:  # ✅ Có resources limits
+            cpu: "500m"
+            memory: "512Mi"
+          requests:
+            cpu: "250m"
+            memory: "256Mi"

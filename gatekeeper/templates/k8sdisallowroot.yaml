@@ -1,0 +1,51 @@
+# ConstraintTemplate: Cấm chạy container với user root (runAsUser: 0)
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdisallowroot
+  annotations:
+    description: Cấm containers chạy với user root để tăng bảo mật
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDisallowRoot
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdisallowroot
+
+        violation[{"msg": msg}] {
+          # Check Pod-level securityContext
+          input.review.object.spec.securityContext.runAsUser == 0
+          msg := "Running as root user (runAsUser: 0) at Pod level is not allowed"
+        }
+
+        violation[{"msg": msg}] {
+          # Check container-level securityContext
+          container := input_containers[_]
+          container.securityContext.runAsUser == 0
+          msg := sprintf("Container '%s' is running as root user (runAsUser: 0)", [container.name])
+        }
+
+        violation[{"msg": msg}] {
+          # Check template.spec.securityContext (for Deployments, StatefulSets, etc.)
+          input.review.object.spec.template.spec.securityContext.runAsUser == 0
+          msg := "Running as root user (runAsUser: 0) at template.spec level is not allowed"
+        }
+
+        input_containers[c] {
+          c := input.review.object.spec.containers[_]
+        }
+
+        input_containers[c] {
+          c := input.review.object.spec.initContainers[_]
+        }
+
+        input_containers[c] {
+          c := input.review.object.spec.template.spec.containers[_]
+        }
+
+        input_containers[c] {
+          c := input.review.object.spec.template.spec.initContainers[_]
+        }

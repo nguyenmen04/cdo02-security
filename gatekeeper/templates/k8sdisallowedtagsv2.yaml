@@ -1,0 +1,67 @@
+# ConstraintTemplate: Cấm image tag :latest
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8sdisallowedtagsv2
+  annotations:
+    description: Cấm sử dụng image tag :latest để tránh không kiểm soát được version
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sDisallowedTagsV2
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            tags:
+              type: array
+              description: "List of tags bị cấm"
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8sdisallowedtagsv2
+
+        violation[{"msg": msg}] {
+          container := input_containers[_]
+          tags := [tag | tag := input.parameters.tags[_]]
+          image := container.image
+          
+          # Tách image name và tag
+          [_, tag] := split(image, ":")
+          
+          # Kiểm tra tag có trong danh sách cấm
+          tag == tags[_]
+          
+          msg := sprintf("Container '%s' uses a disallowed tag '%s' on image '%s'", [container.name, tag, image])
+        }
+
+        violation[{"msg": msg}] {
+          container := input_containers[_]
+          tags := [tag | tag := input.parameters.tags[_]]
+          image := container.image
+          
+          # Kiểm tra image không có tag (mặc định :latest)
+          not contains(image, ":")
+          "latest" == tags[_]
+          
+          msg := sprintf("Container '%s' uses image '%s' without tag, which defaults to ':latest'", [container.name, image])
+        }
+
+        input_containers[c] {
+          c := input.review.object.spec.containers[_]
+        }
+
+        input_containers[c] {
+          c := input.review.object.spec.initContainers[_]
+        }
+
+        input_containers[c] {
+          c := input.review.object.spec.template.spec.containers[_]
+        }
+
+        input_containers[c] {
+          c := input.review.object.spec.template.spec.initContainers[_]
+        }

@@ -1,0 +1,28 @@
+# Test deployment vi phạm: chạy với root user - PHẢI REJECT
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-invalid-root
+  namespace: demo
+  labels:
+    owner: team-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-invalid
+  template:
+    metadata:
+      labels:
+        app: test-invalid
+        owner: team-platform
+    spec:
+      securityContext:
+        runAsUser: 0  # ❌ Vi phạm: Chạy với root user
+      containers:
+      - name: app
+        image: nginx:1.21.6
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"

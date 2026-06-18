@@ -1,0 +1,23 @@
+# ArgoCD Application: Deploy ConstraintTemplates
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gatekeeper-templates
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "0"  # Deploy sau gatekeeper-system
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/YOUR_USERNAME/YOUR_REPO.git  # CẬP NHẬT: đổi thành repo của bạn
+    targetRevision: HEAD
+    path: gatekeeper/templates
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: gatekeeper-system
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

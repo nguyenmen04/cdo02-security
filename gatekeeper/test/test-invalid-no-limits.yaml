@@ -1,0 +1,25 @@
+# Test deployment vi phạm: không có resources.limits - PHẢI REJECT
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-invalid-no-limits
+  namespace: demo
+  labels:
+    owner: team-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-invalid
+  template:
+    metadata:
+      labels:
+        app: test-invalid
+        owner: team-platform
+    spec:
+      securityContext:
+        runAsUser: 1000
+      containers:
+      - name: app
+        image: nginx:1.21.6
+        # ❌ Vi phạm: Thiếu resources.limits

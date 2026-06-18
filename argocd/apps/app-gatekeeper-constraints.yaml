@@ -1,0 +1,21 @@
+# ArgoCD Application: Deploy Constraints
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: gatekeeper-constraints
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"  # Deploy sau templates
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/YOUR_USERNAME/YOUR_REPO.git  # CẬP NHẬT: đổi thành repo của bạn
+    targetRevision: HEAD
+    path: gatekeeper/constraints
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default  # Constraints áp dụng cluster-wide
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true

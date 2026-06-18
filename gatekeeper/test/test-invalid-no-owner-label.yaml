@@ -1,0 +1,27 @@
+# Test deployment vi phạm: thiếu label owner - PHẢI REJECT
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-invalid-no-owner
+  namespace: demo
+  # ❌ Vi phạm: Thiếu label owner
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-invalid
+  template:
+    metadata:
+      labels:
+        app: test-invalid
+        # ❌ Vi phạm: Thiếu label owner trong template
+    spec:
+      securityContext:
+        runAsUser: 1000
+      containers:
+      - name: app
+        image: nginx:1.21.6
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"

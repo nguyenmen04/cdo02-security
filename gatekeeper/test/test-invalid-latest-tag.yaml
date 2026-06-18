@@ -1,0 +1,28 @@
+# Test deployment vi phạm: sử dụng :latest tag - PHẢI REJECT
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: test-invalid-latest
+  namespace: demo
+  labels:
+    owner: team-platform
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: test-invalid
+  template:
+    metadata:
+      labels:
+        app: test-invalid
+        owner: team-platform
+    spec:
+      securityContext:
+        runAsUser: 1000
+      containers:
+      - name: app
+        image: nginx:latest  # ❌ Vi phạm: sử dụng tag :latest
+        resources:
+          limits:
+            cpu: "500m"
+            memory: "512Mi"

@@ -1,0 +1,23 @@
+# ArgoCD Application for RBAC
+apiVersion: argoproj.io/v1alpha1
+kind: Application
+metadata:
+  name: rbac
+  namespace: argocd
+  annotations:
+    argocd.argoproj.io/sync-wave: "1"
+spec:
+  project: default
+  source:
+    repoURL: https://github.com/YOUR_USERNAME/YOUR_REPO.git  # CẬP NHẬT: đổi thành repo của bạn
+    targetRevision: HEAD
+    path: rbac
+  destination:
+    server: https://kubernetes.default.svc
+    namespace: default  # RBAC resources được tạo ở các namespace khác nhau
+  syncPolicy:
+    automated:
+      prune: true
+      selfHeal: true
+    syncOptions:
+    - CreateNamespace=true

@@ -7,6 +7,7 @@ metadata:
   namespace: demo
   labels:
     app: api
+    owner: team-platform  # Required by Gatekeeper policy
   annotations:
     argocd.argoproj.io/sync-wave: "0"
 spec:
@@ -18,7 +19,12 @@ spec:
     metadata:
       labels:
         app: api
+        owner: team-platform  # Required by Gatekeeper policy
     spec:
+      securityContext:
+        runAsUser: 1000  # Non-root user (required by Gatekeeper policy)
+        runAsNonRoot: true
+        fsGroup: 1000
       containers:
       - name: api
         image: ghcr.io/nguyenmen04/w10-api:0.0.1

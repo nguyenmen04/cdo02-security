@@ -1,0 +1,65 @@
+# ConstraintTemplate: Bắt buộc phải có resources.limits
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredresources
+  annotations:
+    description: Bắt buộc containers phải có resources.limits để tránh pod ăn hết tài nguyên node
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredResources
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            limits:
+              type: array
+              description: "List of resources cần có limits (cpu, memory)"
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8srequiredresources
+
+        violation[{"msg": msg}] {
+          container := input_containers[_]
+          required := {resource | resource := input.parameters.limits[_]}
+          provided := {resource | container.resources.limits[resource]}
+          missing := required - provided
+          count(missing) > 0
+          
+          msg := sprintf("Container '%s' is missing required resource limits: %v", [container.name, missing])
+        }
+
+        violation[{"msg": msg}] {
+          container := input_containers[_]
+          not container.resources
+          
+          msg := sprintf("Container '%s' has no resources defined", [container.name])
+        }
+
+        violation[{"msg": msg}] {
+          container := input_containers[_]
+          not container.resources.limits
+          
+          msg := sprintf("Container '%s' has no resource limits defined", [container.name])
+        }
+
+        input_containers[c] {
+          c := input.review.object.spec.containers[_]
+        }
+
+        input_containers[c] {
+          c := input.review.object.spec.initContainers[_]
+        }
+
+        input_containers[c] {
+          c := input.review.object.spec.template.spec.containers[_]
+        }
+
+        input_containers[c] {
+          c := input.review.object.spec.template.spec.initContainers[_]
+        }

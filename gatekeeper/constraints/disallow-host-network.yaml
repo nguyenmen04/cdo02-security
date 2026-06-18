@@ -1,0 +1,15 @@
+# Constraint 4: Cấm hostNetwork: true
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sDisallowHostNetwork
+metadata:
+  name: disallow-host-network
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+    - apiGroups: [""]
+      kinds: ["Pod"]
+    - apiGroups: ["apps"]
+      kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+    - apiGroups: ["argoproj.io"]
+      kinds: ["Rollout"]

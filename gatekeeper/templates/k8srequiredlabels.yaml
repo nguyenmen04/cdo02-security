@@ -1,0 +1,51 @@
+# Custom ConstraintTemplate: Bắt buộc phải có label owner
+apiVersion: templates.gatekeeper.sh/v1
+kind: ConstraintTemplate
+metadata:
+  name: k8srequiredlabels
+  annotations:
+    description: Bắt buộc workloads phải có label owner để dễ quản lý và tracking
+spec:
+  crd:
+    spec:
+      names:
+        kind: K8sRequiredLabels
+      validation:
+        openAPIV3Schema:
+          type: object
+          properties:
+            labels:
+              type: array
+              description: "List of labels bắt buộc phải có"
+              items:
+                type: string
+  targets:
+    - target: admission.k8s.gatekeeper.sh
+      rego: |
+        package k8srequiredlabels
+
+        violation[{"msg": msg}] {
+          # Lấy danh sách labels được cung cấp trong manifest
+          provided := {label | input.review.object.metadata.labels[label]}
+          
+          # Lấy danh sách labels bắt buộc từ parameters
+          required := {label | label := input.parameters.labels[_]}
+          
+          # Tính labels còn thiếu
+          missing := required - provided
+          
+          # Nếu thiếu label → vi phạm
+          count(missing) > 0
+          
+          msg := sprintf("Resource '%s' is missing required labels: %v", [input.review.object.metadata.name, missing])
+        }
+
+        violation[{"msg": msg}] {
+          # Kiểm tra template.metadata.labels cho Deployments, StatefulSets, etc.
+          provided := {label | input.review.object.spec.template.metadata.labels[label]}
+          required := {label | label := input.parameters.labels[_]}
+          missing := required - provided
+          count(missing) > 0
+          
+          msg := sprintf("Resource '%s' template is missing required labels: %v", [input.review.object.metadata.name, missing])
+        }

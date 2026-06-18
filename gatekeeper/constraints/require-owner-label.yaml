@@ -1,0 +1,16 @@
+# Custom Constraint: Bắt buộc có label owner
+apiVersion: constraints.gatekeeper.sh/v1beta1
+kind: K8sRequiredLabels
+metadata:
+  name: require-owner-label
+spec:
+  enforcementAction: deny
+  match:
+    kinds:
+    - apiGroups: ["apps"]
+      kinds: ["Deployment", "StatefulSet", "DaemonSet", "ReplicaSet"]
+    - apiGroups: ["argoproj.io"]
+      kinds: ["Rollout"]
+  parameters:
+    labels:
+    - "owner"
