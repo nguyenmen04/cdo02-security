@@ -9,7 +9,7 @@ metadata:
 spec:
   project: default
   source:
-    repoURL: https://github.com/YOUR_USERNAME/YOUR_REPO.git  # CẬP NHẬT: đổi thành repo của bạn
+    repoURL: https://github.com/nguyenmen04/cdo02-security.git
     targetRevision: HEAD
     path: gatekeeper/constraints
   destination:

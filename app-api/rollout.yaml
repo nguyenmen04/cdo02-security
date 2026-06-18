@@ -27,10 +27,12 @@ spec:
         fsGroup: 1000
       containers:
       - name: api
-        image: ghcr.io/nguyenmen04/w10-api:0.0.2
+        image: hashicorp/http-echo:latest
         imagePullPolicy: IfNotPresent
+        args:
+        - "-text=Hello from Lab W10"
         ports:
-        - containerPort: 8080
+        - containerPort: 5678
           protocol: TCP
         env:
         - name: VERSION
