@@ -29,10 +29,8 @@ spec:
       - name: api
         image: ghcr.io/nguyenmen04/w10-api:0.0.3
         imagePullPolicy: IfNotPresent
-        args:
-        - "-text=Hello from Lab W10"
         ports:
-        - containerPort: 5678
+        - containerPort: 8080
           protocol: TCP
         env:
         - name: VERSION
