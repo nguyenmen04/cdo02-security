@@ -39,7 +39,7 @@ spec:
               - to: 'nguyenthimen190504@gmail.com'
                 from: 'nguyenthimen190504@gmail.com'
                 smarthost: 'smtp.gmail.com:587'
-                auth_username: 'vuongbachdoan@gmail.com'
+                auth_username: 'nguyenthimen190504@gmail.com'
                 auth_password_file: /etc/alertmanager/secrets/alertmanager-email/password
                 require_tls: true
                 headers:
