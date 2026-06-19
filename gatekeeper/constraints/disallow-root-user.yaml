@@ -6,6 +6,11 @@ metadata:
 spec:
   enforcementAction: deny
   match:
+    excludedNamespaces:
+    - kube-system
+    - gatekeeper-system
+    - monitoring
+    - argocd
     kinds:
     - apiGroups: [""]
       kinds: ["Pod"]
