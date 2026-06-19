@@ -3,6 +3,9 @@ kind: Deployment
 metadata:
   name: payments-app
   namespace: payments
+  labels:
+    app: payments
+    owner: payments
 spec:
   replicas: 1
   selector:
@@ -12,10 +15,11 @@ spec:
     metadata:
       labels:
         app: payments
+        owner: payments
     spec:
       containers:
         - name: app
-          image: ghcr.io/nguyenmen04/w10-api:latest
+          image: ghcr.io/nguyenmen04/w10-api:v1.0.0
           ports:
             - containerPort: 8080
           resources:
