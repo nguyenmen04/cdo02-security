@@ -1,0 +1,14 @@
+apiVersion: policy.sigstore.dev/v1beta1
+kind: ClusterImagePolicy
+metadata:
+  name: image-policy
+spec:
+  images:
+    - glob: "ghcr.io/nguyenmen04/w10-api**"
+  authorities:
+    - key:
+        data: |
+          -----BEGIN PUBLIC KEY-----
+          MFkwEwYHKoZIzj0CAQYIKoZIzj0DAQcDQgAE+dummy+public+key+goes+here+
+          +dummy+public+key+goes+here+dummy+public+key+goes+here+dummy+p+Q==
+          -----END PUBLIC KEY-----

@@ -219,3 +219,10 @@ minikube stop -p w10
 minikube delete -p w10
 ```
 
+## W10 Afternoon Lab - Multi-tenant Security Challenge
+
+**Question 1: Vì sao guardrail cũ tự áp cho team B mà không cần viết luật mới?**
+**Answer:** Vì Gatekeeper policies thường được thiết lập ở cấp cluster hoặc dựa trên các label matcher chung (như `policy.sigstore.dev/include: "true"` đối với Sigstore Cosign). Khi team B (payments) có namespace mới đáp ứng đủ nhãn hiệu phù hợp, Admission Controller (như Gatekeeper hoặc Policy Controller) sẽ tự động kiểm tra và áp dụng các luật mà không cần phải cài đặt một luật mới dành riêng cho họ.
+
+**Question 2: Role/RoleBinding khác ClusterRoleBinding ra sao để giữ cô lập?**
+**Answer:** `Role` và `RoleBinding` chỉ giới hạn quyền hạn truy cập bên trong ranh giới một namespace cụ thể (như namespace `payments`). Ngược lại, `ClusterRoleBinding` cấp quyền truy cập trên toàn bộ cluster và có thể ảnh hưởng đến tất cả các namespaces khác. Việc dùng RoleBinding đảm bảo team `payments` được "bó" quyền trong không gian riêng của họ, giữ an toàn và cô lập hoàn toàn khỏi hệ thống chung hay team `demo`.
